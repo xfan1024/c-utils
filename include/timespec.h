@@ -25,8 +25,10 @@
 #ifndef __timespec_h__
 #define __timespec_h__
 
+#include <unistd.h>
 #include <sys/time.h>
 #include <time.h>
+#include <die.h>
 
 #define TIMESPEC_MS_PER_SEC 1000
 #define TIMESPEC_US_PER_SEC 1000000
@@ -271,19 +273,27 @@ static inline struct timespec timespec_add_timeval(struct timespec ts, struct ti
             );
 }
 
-static inline struct timespec timespec_current()
+static inline struct timespec timespec_get(clockid_t id)
 {
+    int res;
     struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
+    res = clock_gettime(id, &ts);
+    if (res) {
+        die_perror("clock_gettime, clockid=%d", (int)id);
+    }
     return ts;
 }
 
-static inline struct timespec timespec_since_boot()
+static inline struct timespec timespec_realtime()
 {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ts;
+    return timespec_get(CLOCK_REALTIME);
 }
+
+static inline struct timespec timespec_monotonic()
+{
+    return timespec_get(CLOCK_MONOTONIC);
+}
+
 
 #endif
 
