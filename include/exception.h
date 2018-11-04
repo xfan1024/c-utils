@@ -16,7 +16,7 @@ struct exception_handler {
 
 #define e_try(eh) { \
     struct exception_handler * __local_eh = (eh); \
-    volatile int __local_err; \
+    int __local_err; \
     __local_err = setjmp(__local_eh->jb); \
     if (__local_err == 0) {
 
